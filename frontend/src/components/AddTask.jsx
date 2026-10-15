@@ -1,6 +1,6 @@
 import React from 'react'
 import { Card } from './ui/card'
-import { Input } from '@base-ui/react'
+import { Button, Input } from '@base-ui/react'
 import { Plus } from 'lucide-react'
 
 const AddTask = () => {
