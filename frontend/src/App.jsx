@@ -8,6 +8,7 @@ function App() {
 
   return (
     <>
+      <Toaster richColors />
       <BrowserRouter>
         <Routes>
           <Route
