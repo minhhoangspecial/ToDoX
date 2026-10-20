@@ -1,5 +1,24 @@
 export const FilterType = {
     all: "all",
     active: "active",
-    completed: "completed",
+    completed: "complete",
 };
+
+export const options = [
+    {
+        value: "today",
+        label: "today",
+    },
+    {
+        value: "week",
+        label: "week",
+    },
+    {
+        value: "month",
+        label: "month",
+    },
+    {
+        value: "all",
+        label: "all",
+    },
+];

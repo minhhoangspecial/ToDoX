@@ -44,6 +44,28 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
         }
     }
 
+    const toggleTaskCompleteButton = async () => {
+        try {
+            if (task.status === 'active') {
+                await api.put(`/tasks/${task._id}`, {
+                    status: 'complete',
+                    completedAt: new Date().toISOString(),
+                });
+                toast.success(`${task.title} was succeeded.`)
+            } else {
+                await api.put(`/tasks/${task._id}`, {
+                    status: 'active',
+                    completedAt: null,
+                });
+                toast.success(`${task.title} was changed into incomplete.`)
+            }
+            handleTaskChanged();
+        } catch (error) {
+            console.error("Error when update task.", error);
+            console.error("Error when update task.");
+        }
+    }
+
     return (
         <Card className={cn(
             "p-4 bg-gradient-card border-0 shadow-custom-md hover:shadow-custom-lg transition-all duration-200 animate-fade-in group",
@@ -58,12 +80,13 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
                     size="icon"
                     className={cn(
                         "flex-shrink-0 size-8 rounded-full transition-all duration-200",
-                        task.status === "completed"
+                        task.status === "complete"
                             ? "text-success hover:text-success/80"
                             : "text-muted-foreground hover:text-primary"
                     )}
+                    onClick={toggleTaskCompleteButton}
                 >
-                    {task.status === "completed" ? (
+                    {task.status === "complete" ? (
                         <CheckCircle2 className="size-5" />
                     ) : (
                         <Circle className="size-5" />
