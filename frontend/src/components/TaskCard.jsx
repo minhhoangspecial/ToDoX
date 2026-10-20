@@ -1,5 +1,5 @@
 import { Calendar, CheckCircle2, Circle, SquarePen, Trash2 } from 'lucide-react';
-import React from 'react'
+import React, { useState } from 'react'
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
@@ -8,6 +8,8 @@ import api from '@/lib/axios';
 import { toast } from 'sonner';
 
 const TaskCard = ({ task, index, handleTaskChanged }) => {
+    const [isEditting, setIsEditting] = useState(false);
+    const [updateTaskTitle, setUpdateTaskTitle] = useState(task.title || "");
 
     let isEditing = false;
 
@@ -18,9 +20,30 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
             handleTaskChanged();
         } catch (error) {
             console.error("Error when delete task.", error);
-            toast.error("Error when delete task.", error);
+            toast.error("Error when delete task.");
         }
     }
+
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            updateTask();
+        }
+    }
+
+    const updateTask = async () => {
+        try {
+            setIsEditting(false);
+            await api.put(`/tasks/${task._id}`, {
+                title: updateTaskTitle
+            });
+            toast.success(`Task was changed into ${updateTaskTitle}`)
+            handleTaskChanged();
+        } catch (error) {
+            console.error("Error when update task.", error);
+            console.error("Error when update task.");
+        }
+    }
+
     return (
         <Card className={cn(
             "p-4 bg-gradient-card border-0 shadow-custom-md hover:shadow-custom-lg transition-all duration-200 animate-fade-in group",
@@ -48,11 +71,18 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
                 </Button>
 
                 <div className="flex-1 min-w-0">
-                    {isEditing ? (
+                    {isEditting ? (
                         <Input
                             placeholder="What needs to be done?"
                             className="flex-1 h-12 text-base border-border/50 focus:border-primary/50 focus:ring-primary/20"
                             type="text"
+                            value={updateTaskTitle}
+                            onChange={(e) => setUpdateTaskTitle(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            onBlur={() => {
+                                setIsEditting(false);
+                                setUpdateTaskTitle(task.title || '');
+                            }}
                         />
                     ) : (
                         <p
@@ -85,6 +115,10 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
                         variant='ghost'
                         size='icon'
                         className='flex-shrink-0 transition-colors size-8 text-muted-foreground hover:text-info'
+                        onClick={() => {
+                            setIsEditting(true);
+                            setUpdateTaskTitle(task.title || "");
+                        }}
                     >
                         <SquarePen className="size-4" />
 
