@@ -25,7 +25,7 @@ export const getAllTasks = async (req, res) => {
         }
     }
 
-    const query = startDate ? { createAt: { $gte: startDate } } : {};
+    const query = startDate ? { createdAt: { $gte: startDate } } : {};
 
     try {
         const result = await Task.aggregate([

@@ -6,6 +6,7 @@ import StatsAndFilters from '@/components/StatsAndFilters'
 import TaskList from '@/components/TaskList'
 import TaskListPagination from '@/components/TaskListPagination'
 import api from '@/lib/axios'
+import { visibleTaskLimit } from '@/lib/data'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -14,12 +15,15 @@ const HomePage = () => {
     const [activeTaskCount, setActiveTaskCount] = useState(0);
     const [completeTaskCount, setCompleteTaskCount] = useState(0);
     const [filter, setFilter] = useState('all');
+    const [dateQuery, setDateQuery] = useState('today');
+    const [page, setPage] = useState(1);
+
     useEffect(() => {
         fetchTasks();
-    }, [])
+    }, [dateQuery])
     const fetchTasks = async () => {
         try {
-            const res = await api.get("/tasks");
+            const res = await api.get(`/tasks?filter=${dateQuery}`);
             settaskBuffer(res.data.tasks);
             setActiveTaskCount(res.data.activeCount);
             setCompleteTaskCount(res.data.completeCount);
@@ -35,6 +39,22 @@ const HomePage = () => {
         fetchTasks();
     }
 
+    const handleNext = () => {
+        if (page < totalPages) {
+            setPage((prev) => prev + 1);
+        }
+    };
+
+    const handlePrev = () => {
+        if (page > 1) {
+            setPage((prev) => prev - 1);
+        }
+    };
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
     const filteredTasks = taskBuffer.filter((task) => {
         switch (filter) {
             case 'active':
@@ -45,6 +65,15 @@ const HomePage = () => {
                 return true;
         }
     });
+
+    const visibleTasks = filteredTasks.slice(
+
+        [page - 1] * visibleTaskLimit,
+        page * visibleTaskLimit
+    );
+
+    const totalPages = Math.ceil(filteredTasks.length / visibleTaskLimit)
+
     return (
         <div className="min-h-screen w-full bg-[#fefcff] relative">
             <div
@@ -74,14 +103,19 @@ const HomePage = () => {
 
 
                     <TaskList
-                        filteredTasks={filteredTasks}
+                        filteredTasks={visibleTasks}
                         filter={filter}
                         handleTaskChanged={handleTaskChanged} />
-
-
                     <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-                        <TaskListPagination />
-                        <DateTimeFilter />
+                        <TaskListPagination
+                            handleNext={handleNext}
+                            handlePrev={handlePrev}
+                            handlePageChange={handlePageChange}
+                            page={page}
+                            totalPages={totalPages}
+                        />
+
+                        <DateTimeFilter dateQuery={dateQuery} setDateQuery={setDateQuery} />
                     </div>
 
                     <Footer

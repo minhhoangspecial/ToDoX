@@ -17,24 +17,28 @@ import {
 } from "@/components/ui/popover"
 import { options } from "@/lib/data"
 
-const DateTimeFilter = () => {
+const DateTimeFilter = ({ dateQuery, setDateQuery }) => {
     const [open, setOpen] = React.useState(false)
-    const [value, setValue] = React.useState("")
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    size="lg"
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                >
-                    Today
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 " />
-                </Button>
-            </PopoverTrigger>
+            <PopoverTrigger
+                render={
+                    <Button
+                        size="lg"
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={open}
+                        className="hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                    />
+                }
+            >
+                {dateQuery
+                    ? options.find((option) => option.value === dateQuery)?.label
+                    : options[0].label
+                }
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 " />
+            </PopoverTrigger >
             <PopoverContent className="w-[200px] p-0">
                 <Command>
                     <CommandList>
@@ -44,16 +48,15 @@ const DateTimeFilter = () => {
                                     key={option.value}
                                     value={option.value}
                                     onSelect={(currentValue) => {
-                                        // Nếu chọn lại item đang chọn thì bỏ chọn (xóa value)
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        setOpen(false)
+                                        setDateQuery(currentValue);
+                                        setOpen(false);
                                     }}
                                     className="cursor-pointer hover:!bg-slate-200 hover:!text-black transition-colors"
                                 >
                                     <Check
                                         className={cn(
                                             "mr-2 h-4 w-4",
-                                            value === option.value ? "opacity-100" : "opacity-0"
+                                            dateQuery === option.value ? "opacity-100" : "opacity-0"
                                         )}
                                     />
                                     {option.label}
@@ -63,7 +66,7 @@ const DateTimeFilter = () => {
                     </CommandList>
                 </Command>
             </PopoverContent>
-        </Popover>
+        </Popover >
     )
 }
 export default DateTimeFilter
